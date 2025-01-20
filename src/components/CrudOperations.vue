@@ -1,0 +1,111 @@
+<template>
+    <div class="crud-operations">
+      <h3>CRUD Operations</h3>
+  
+      <!-- Fetch All Documents -->
+      <button @click="fetchDocuments">Get All Documents</button>
+      <ul v-if="documents.length">
+        <li v-for="doc in documents" :key="doc.id">
+          ID: {{ doc.id }}, Name: {{ doc.name }}, Title: {{ doc.title }}
+        </li>
+      </ul>
+  
+      <!-- Create New Document -->
+      <button @click="createDocument">Create Document</button>
+  
+      <!-- Get Document by ID -->
+      <div>
+        <input v-model="fetchId" placeholder="Enter ID to fetch" />
+        <button @click="fetchDocumentById">Get Document by ID</button>
+        <p v-if="documentById">
+          ID: {{ documentById.id }}, Name: {{ documentById.name }},
+          Title: {{ documentById.title }}
+        </p>
+      </div>
+  
+      <!-- Delete Document -->
+      <div>
+        <input v-model="deleteId" placeholder="Enter ID to delete" />
+        <button @click="deleteDocument">Delete Document</button>
+      </div>
+    </div>
+  </template>
+  
+  <script>
+  import axios from "axios";
+  
+  export default {
+    data() {
+      return {
+        documents: [],
+        fetchId: "",
+        deleteId: "",
+        documentById: null,
+      };
+    },
+    methods: {
+      async fetchDocuments() {
+        try {
+          const response = await axios.get("http://localhost:8080/api/documents", {
+            auth: { username: "admin", password: "admin123" },
+          });
+          this.documents = response.data;
+        } catch (error) {
+          console.error("Error fetching documents:", error);
+        }
+      },
+      async createDocument() {
+  try {
+    const newDoc = {
+      name: `Document_${Date.now()}`,
+      title: "Sample Document",
+      content: "This is a sample document content.",
+      type: "FILE", // Default type
+    };
+    const response = await axios.post("http://localhost:8080/api/documents", newDoc, {
+      auth: { username: "admin", password: "admin123" },
+    });
+    console.log("Document created:", response.data);
+    this.$emit("update-files", [...this.documents, response.data]); // Sync with parent
+  } catch (error) {
+    console.error("Error creating document:", error);
+    alert("Failed to create document. Please try again.");
+  }
+}
+,
+      async fetchDocumentById() {
+        try {
+          const response = await axios.get(
+            `http://localhost:8080/api/documents/${this.fetchId}`,
+            { auth: { username: "admin", password: "admin123" } }
+          );
+          this.documentById = response.data;
+        } catch (error) {
+          console.error("Error fetching document by ID:", error);
+        }
+      },
+      async deleteDocument() {
+        try {
+          await axios.delete(
+            `http://localhost:8080/api/documents/${this.deleteId}`,
+            { auth: { username: "admin", password: "admin123" } }
+          );
+          console.log(`Document with ID ${this.deleteId} deleted.`);
+          this.fetchDocuments(); // Refresh the list
+        } catch (error) {
+          console.error("Error deleting document:", error);
+        }
+      },
+    },
+  };
+  </script>
+  
+  <style>
+  .crud-operations {
+    padding: 20px;
+    border: 1px solid #ccc;
+    margin: 16px;
+    background-color: #f9f9f9;
+  }
+  </style>
+  
