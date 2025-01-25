@@ -1,10 +1,20 @@
 <template>
+  <div v-if="showModal" class="modal-overlay">
     <div class="modal">
       <h2>Admin Login</h2>
-      <input type="password" v-model="password" placeholder="Enter password" />
-      <button @click="login">Login</button>
+      <input 
+        type="password" 
+        v-model="password" 
+        placeholder="Enter password" 
+      />
+      <div class="modal-actions">
+        <button @click="login">Login</button>
+        <button @click="$emit('close')">Cancel</button>
+      </div>
     </div>
-  </template>
+  </div>
+</template>
+
   
   <script>
   export default {

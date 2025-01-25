@@ -31,24 +31,26 @@
       </li>
     </ul>
 
-    <!-- Modal for Creating a New File -->
-    <div v-if="showCreateModal" class="modal-overlay">
-      <div class="modal">
-        <h3>Create New Document</h3>
-        <input
-          v-model="newFileName"
-          placeholder="Enter file name"
-        />
-        <textarea
-          v-model="newFileContent"
-          placeholder="Enter file content"
-        ></textarea>
-        <div class="modal-actions">
-          <button @click="createNewFile">Save</button>
-          <button @click="closeCreateModal">Cancel</button>
-        </div>
-      </div>
+<!-- Modal for Creating a New File -->
+<div v-if="showCreateModal" class="modal-overlay">
+  <div class="modal">
+    <h3>Create New Document</h3>
+    <input
+      v-model="newFileName"
+      placeholder="Enter file name"
+    />
+    <textarea
+      v-model="newFileContent"
+      placeholder="Enter file content"
+      rows="5"
+    ></textarea>
+    <div class="modal-actions">
+      <button @click="createNewFile">Save</button>
+      <button @click="closeCreateModal">Cancel</button>
     </div>
+  </div>
+</div>
+
   </div>
 </template>
 
@@ -168,143 +170,72 @@ export default {
 </script>
 
 <style>
-.file-explorer {
-  width: 20%;
-  height: 100%;
-  background-color: #000;
-  color: #CC00CC;
-  border-right: 3px solid #CC00CC;
-  padding: 10px;
-  box-sizing: border-box;
-}
-
-.file-explorer-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 2px solid #CC00CC;
-  padding-bottom: 5px;
-  margin-bottom: 10px;
-}
-
-.upload-button,
-.create-button,
-.delete-button {
-  background-color: transparent;
-  color: #ccc;
-  border: 1px solid #ccc;
-  padding: 5px 10px;
-  font-size: 14px;
-  font-family: "Courier New", monospace;
-  cursor: pointer;
-  border-radius: 4px;
-  transition: all 0.3s ease;
-}
-
-.upload-button:hover,
-.create-button:hover,
-.delete-button:hover {
-  background-color: #ccc;
-  color: #000;
-}
-
-ul {
-  list-style: none;
-  padding: 0;
-}
-
-.file {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  color: white;
-  margin: 5px 0;
-  cursor: pointer;
-}
-
-/* Modal Styling */
-.modal {
+/* Modal and Overlay Styles */
+.modal-overlay {
   position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: #fff;
-  color: #000;
-  width: 400px;
-  max-width: 90%;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Background dimming */
+  display: flex;
+  justify-content: center;
+  align-items: center;
   z-index: 1000;
 }
 
-.modal-content {
-  display: flex;
-  flex-direction: column;
+.modal {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.25); /* Add depth */
+  width: 400px;
+  max-width: 90%;
+  animation: fadeIn 0.3s ease-in-out; /* Smooth fade-in animation */
 }
 
-.modal-content .input,
-.modal-content .textarea {
-  margin-bottom: 10px;
-  padding: 8px;
-  font-size: 14px;
-  width: 100%;
+.modal h3 {
+  margin: 0 0 10px;
+  font-size: 20px;
+  text-align: center;
 }
 
 .modal-actions {
   display: flex;
-  justify-content: flex-end;
-  gap: 10px;
+  justify-content: space-between;
+  margin-top: 10px;
 }
 
-.save-button,
-.cancel-button {
-  padding: 5px 15px;
-  border: 1px solid #ccc;
-  background-color: #f4f4f4;
+.modal-actions button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
-.save-button:hover,
-.cancel-button:hover {
-  background-color: #ccc;
+.modal-actions button:first-child {
+  background-color: #4CAF50; /* Save button */
+  color: white;
 }
 
-/* RESPONSIVE STYLES */
-@media screen and (max-width: 768px) {
-  .file-explorer {
-    width: 100%;
-    border-right: none;
-    border-bottom: 3px solid #CC00CC;
-    padding: 5px;
-  }
-
-  .file-explorer-header {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .modal {
-    width: 100%; /* Stretch modal to full width */
-    max-width: 95%;
-  }
+.modal-actions button:last-child {
+  background-color: #f44336; /* Cancel button */
+  color: white;
 }
 
-@media screen and (max-width: 480px) {
-  .file {
-    font-size: 12px;
-  }
+.modal-actions button:hover {
+  filter: brightness(90%);
+}
 
-  .upload-button,
-  .create-button,
-  .delete-button {
-    font-size: 12px;
-    padding: 4px 8px;
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
   }
-
-  .modal-content .input,
-  .modal-content .textarea {
-    font-size: 12px;
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 </style>
