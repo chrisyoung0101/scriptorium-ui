@@ -86,7 +86,7 @@ export default {
 
           try {
             // Save to database
-            await axios.post("http://localhost:8080/api/documents", {
+            await axios.post(`${process.env.VUE_APP_API_URL}/api/documents`, {
               name: file.name,
               title: file.name,
               content,
@@ -113,7 +113,7 @@ export default {
     // Delete a file or folder from the database
     async deleteFile(fileId) {
       try {
-        await axios.delete(`http://localhost:8080/api/documents/${fileId}`);
+        await axios.delete(`${process.env.VUE_APP_API_URL}/api/documents/${fileId}`);
         alert("File or folder deleted successfully.");
 
         // Update the file list
@@ -144,7 +144,7 @@ export default {
       }
 
       try {
-        const response = await axios.post("http://localhost:8080/api/documents", {
+        const response = await axios.post(`${process.env.VUE_APP_API_URL}/api/documents`, {
           name: this.newFileName.trim(),
           title: this.newFileName.trim(),
           content: this.newFileContent,

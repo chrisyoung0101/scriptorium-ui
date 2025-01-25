@@ -1,5 +1,4 @@
 App.vue : 
-
 <template>
   <div id="app">
     <header>
@@ -116,15 +115,24 @@ export default {
     };
   },
   methods: {
-  updateFiles(newFiles) {
-    this.files = newFiles; // Update the file list
+  /**
+   * Global method to handle errors and provide user-friendly feedback.
+   * @param {string} message - The error message to display to the user.
+   */
+  handleError(message) {
+    alert(message); // Display an alert for now. Can be extended to a toast or notification system.
   },
+
+  /**
+   * Fetch the list of files/documents from the backend API.
+   * Maps the backend response to the format expected by the UI.
+   */
   async fetchFiles() {
     try {
       const response = await axios.get("http://localhost:8080/api/documents", {
         headers: { Authorization: "Basic YWRtaW46YWRtaW4=" }, // Replace with valid credentials
       });
-      // Map the response to the file structure used in the UI
+      // Map the response data to the file structure used in the UI
       this.files = response.data.map((doc) => ({
         id: doc.id,
         name: doc.name,
@@ -132,13 +140,29 @@ export default {
       }));
     } catch (error) {
       console.error("Error fetching documents:", error);
-      alert("Failed to fetch files from the database.");
+      this.handleError("Failed to fetch files from the database.");
     }
   },
+
+  /**
+   * Update the list of files in the UI after changes (e.g., file upload, CRUD operations).
+   * @param {Array} newFiles - The updated list of files.
+   */
+  updateFiles(newFiles) {
+    this.files = newFiles; // Update the file list globally
+  },
+
+  /**
+   * Display the content of a selected file in the viewer.
+   * @param {Object} file - The selected file object.
+   */
   viewFileContent(file) {
-    // Display file content in the viewer
     this.selectedFileContent = file.content || "Unable to load content.";
   },
+
+  /**
+   * Show the admin login modal or prompt.
+   */
   showAdminLogin() {
     alert("Admin Login Clicked");
   },
@@ -180,8 +204,8 @@ header {
   height: calc(100vh - 100px); /* Full height minus header/footer */
   border: 2px solid #fff; /* Add white border between sections */
   border-width: 0 2px;
-  padding-left: 20px;
-  padding-right: 20px;
+  padding: 0; /* Remove extra padding to align content */
+  overflow: hidden; /* Prevent content spilling */
 }
 
 /* Directory Tree */
@@ -193,9 +217,53 @@ header {
   border-right: 3px solid #00CCCC;
   padding: 10px;
   box-sizing: border-box;
+  overflow: auto; /* Ensure no clipping */
 }
 
-/* File Explorer and MarkUp Viewer styling inherited */
+/* File Explorer */
+.file-explorer {
+  width: 20%;
+  height: 100%;
+  background-color: #000;
+  color: #CC00CC;
+  border-right: 3px solid #CC00CC;
+  padding: 10px;
+  box-sizing: border-box;
+  overflow: auto; /* Prevent content overflow */
+}
+
+/* MarkUp Viewer */
+.markup-viewer {
+  flex: 1;
+  height: 100%;
+  background-color: #000;
+  color: #ccc;
+  padding: 10px;
+  border-left: 3px solid #CC00CC;
+  overflow-y: auto; /* Prevent vertical overflow */
+  font-family: "Courier New", monospace;
+  white-space: pre-wrap;
+  word-wrap: break-word; /* Prevent text spilling horizontally */
+  box-sizing: border-box; /* Ensure padding is included within width/height */
+}
+
+.markup-viewer h1,
+.markup-viewer h2,
+.markup-viewer h3 {
+  color: #fff;
+}
+
+.markup-viewer p {
+  color: #ccc;
+}
+
+.markup-viewer code {
+  background-color: #333;
+  color: #00ff00;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-family: "Courier New", monospace;
+}
 
 /* CRUD Section */
 .crud-section {
@@ -231,8 +299,57 @@ footer {
   margin-right: 15px;
   cursor: pointer;
 }
-</style>
 
+/* Responsive Adjustments */
+@media screen and (max-width: 768px) {
+  .layout {
+    flex-direction: column; /* Stack sections vertically */
+  }
+
+  .directory-sidebar,
+  .file-explorer,
+  .markup-viewer {
+    width: 100%; /* Full width for all sections */
+    height: auto; /* Allow natural height */
+  }
+
+  .markup-viewer {
+    padding: 10px; /* Improve readability */
+  }
+
+  .crud-section {
+    width: 100%; /* Expand CRUD section to full width */
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .header-title {
+    font-size: 20px;
+    letter-spacing: 3px;
+  }
+
+  .directory-sidebar {
+    padding: 5px;
+    font-size: 12px; /* Adjust font size for smaller screens */
+  }
+
+  .file-explorer {
+    font-size: 12px;
+    padding: 5px;
+  }
+
+  .markup-viewer {
+    font-size: 14px;
+    word-wrap: break-word; /* Ensure content breaks on smaller screens */
+  }
+
+  .footer-colors .color-block {
+    height: 20px; /* Reduce block height in the footer */
+  }
+}
+
+
+</style>
 
 MarkUpViewer : 
 
@@ -292,14 +409,19 @@ export default {
 }
 </style>
 
-
 FileExplorer : 
 
-<template>
+x<template>
   <div class="file-explorer">
     <div class="file-explorer-header">
       <h3>File Explorer</h3>
+      <!-- Existing Upload Button -->
       <button class="upload-button" @click="triggerFileUpload">Upload</button>
+
+      <!-- New Create Button -->
+      <button class="create-button" @click="openCreateModal">Create</button>
+
+      <!-- Hidden File Input for Upload -->
       <input
         type="file"
         ref="fileInput"
@@ -308,6 +430,8 @@ FileExplorer :
         style="display: none;"
       />
     </div>
+
+    <!-- File List -->
     <ul>
       <li
         v-for="file in files"
@@ -316,13 +440,34 @@ FileExplorer :
         @click="selectFile(file)"
       >
         {{ file.name }}
+        <button class="delete-button" @click.stop="deleteFile(file.id)">Delete</button>
       </li>
     </ul>
+
+    <!-- Modal for Creating a New File -->
+    <div v-if="showCreateModal" class="modal-overlay">
+      <div class="modal">
+        <h3>Create New Document</h3>
+        <input
+          v-model="newFileName"
+          placeholder="Enter file name"
+        />
+        <textarea
+          v-model="newFileContent"
+          placeholder="Enter file content"
+        ></textarea>
+        <div class="modal-actions">
+          <button @click="createNewFile">Save</button>
+          <button @click="closeCreateModal">Cancel</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import axios from 'axios';
+import axios from "axios";
+
 export default {
   props: {
     files: {
@@ -330,80 +475,108 @@ export default {
       default: () => [],
     },
   },
+  data() {
+    return {
+      showCreateModal: false, // Controls visibility of the "Create" modal
+      newFileName: "", // Stores the new file's name
+      newFileContent: "", // Stores the new file's content
+    };
+  },
   methods: {
-  /**
-   * Trigger file upload dialog.
-   */
-  triggerFileUpload() {
-    this.$refs.fileInput.click();
-  },
+    // Trigger the hidden file input for file uploads
+    triggerFileUpload() {
+      this.$refs.fileInput.click();
+    },
 
-  /**
-   * Handle the file upload process.
-   */
-  async handleFileUpload(event) {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
+    // Handle file upload (already implemented)
+    handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+          const content = e.target.result; // File content
+          const newFile = { name: file.name, content };
 
-      reader.onload = async (e) => {
-        const content = e.target.result; // Get file content
-        const newFile = { name: file.name, fileObject: file, content };
+          try {
+            // Save to database
+            await axios.post("http://localhost:8080/api/documents", {
+              name: file.name,
+              title: file.name,
+              content,
+              type: "FILE",
+            });
+            alert(`File "${file.name}" uploaded successfully.`);
 
-        // Update the UI with the new file
-        this.$emit("update-files", [...this.files, newFile]);
-
-        try {
-          // Check if the file exists in the database
-          const response = await axios.get(`http://localhost:8080/api/documents`);
-          const existingFile = response.data.find((doc) => doc.name === file.name);
-
-          if (!existingFile) {
-            // Prompt the user to save if the file doesn't exist in the database
-            const shouldSave = confirm(
-              `The file "${file.name}" is not saved in the database. Would you like to save it?`
-            );
-
-            if (shouldSave) {
-              await this.saveFileToDatabase(file.name, content);
-            }
-          } else {
-            alert(`The file "${file.name}" already exists in the database.`);
+            // Refresh file list
+            this.$emit("update-files", [...this.files, newFile]);
+          } catch (error) {
+            console.error("Error uploading file:", error);
+            alert("Failed to upload the file.");
           }
-        } catch (error) {
-          console.error("Error checking or saving file:", error);
-          alert("An error occurred while checking or saving the file.");
-        }
-      };
+        };
+        reader.readAsText(file);
+      }
+    },
 
-      reader.readAsText(file);
-    }
-  },
+    // Select a file and notify the parent for display
+    selectFile(file) {
+      this.$emit("select-file", file);
+    },
 
-  /**
-   * Save a file to the database.
-   */
-  async saveFileToDatabase(name, content) {
-    try {
-      await axios.post("http://localhost:8080/api/documents", {
-        name,
-        title: name, // Use the file name as the title for simplicity
-        content,
-      });
-      alert(`File "${name}" has been saved successfully.`);
-    } catch (error) {
-      console.error("Error saving file to the database:", error);
-      alert("Failed to save the file to the database.");
-    }
-  },
+    // Delete a file or folder from the database
+    async deleteFile(fileId) {
+      try {
+        await axios.delete(`http://localhost:8080/api/documents/${fileId}`);
+        alert("File or folder deleted successfully.");
 
-  /**
-   * Handle file selection and emit for parent viewing.
-   */
-  selectFile(file) {
-    this.$emit("select-file", file);
+        // Update the file list
+        this.$emit("update-files", this.files.filter((file) => file.id !== fileId));
+      } catch (error) {
+        console.error("Error deleting file or folder:", error);
+        alert("Failed to delete the file or folder.");
+      }
+    },
+
+    // Open the "Create" modal
+    openCreateModal() {
+      this.showCreateModal = true;
+    },
+
+    // Close the "Create" modal and reset input fields
+    closeCreateModal() {
+      this.showCreateModal = false;
+      this.newFileName = "";
+      this.newFileContent = "";
+    },
+
+    // Create a new file and save it to the database
+    async createNewFile() {
+      if (!this.newFileName.trim()) {
+        alert("File name is required.");
+        return;
+      }
+
+      try {
+        const response = await axios.post("http://localhost:8080/api/documents", {
+          name: this.newFileName.trim(),
+          title: this.newFileName.trim(),
+          content: this.newFileContent,
+          type: "FILE",
+        });
+
+        alert(`File "${this.newFileName}" created successfully.`);
+
+        // Add the new file to the file list
+        this.$emit("update-files", [...this.files, response.data]);
+
+        // Close the modal and reset the input fields
+        this.closeCreateModal();
+      } catch (error) {
+        console.error("Error creating new file:", error);
+        alert("Failed to create the file.");
+      }
+    },
   },
-},
 };
 </script>
 
@@ -415,6 +588,7 @@ export default {
   color: #CC00CC;
   border-right: 3px solid #CC00CC;
   padding: 10px;
+  box-sizing: border-box;
 }
 
 .file-explorer-header {
@@ -426,11 +600,13 @@ export default {
   margin-bottom: 10px;
 }
 
-.upload-button {
+.upload-button,
+.create-button,
+.delete-button {
   background-color: transparent;
   color: #ccc;
   border: 1px solid #ccc;
-  padding: 5px 15px;
+  padding: 5px 10px;
   font-size: 14px;
   font-family: "Courier New", monospace;
   cursor: pointer;
@@ -438,7 +614,9 @@ export default {
   transition: all 0.3s ease;
 }
 
-.upload-button:hover {
+.upload-button:hover,
+.create-button:hover,
+.delete-button:hover {
   background-color: #ccc;
   color: #000;
 }
@@ -449,14 +627,104 @@ ul {
 }
 
 .file {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   color: white;
   margin: 5px 0;
   cursor: pointer;
+}
+
+/* Modal Styling */
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  color: #000;
+  width: 400px;
+  max-width: 90%;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.modal-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-content .input,
+.modal-content .textarea {
+  margin-bottom: 10px;
+  padding: 8px;
+  font-size: 14px;
+  width: 100%;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.save-button,
+.cancel-button {
+  padding: 5px 15px;
+  border: 1px solid #ccc;
+  background-color: #f4f4f4;
+  cursor: pointer;
+}
+
+.save-button:hover,
+.cancel-button:hover {
+  background-color: #ccc;
+}
+
+/* RESPONSIVE STYLES */
+@media screen and (max-width: 768px) {
+  .file-explorer {
+    width: 100%;
+    border-right: none;
+    border-bottom: 3px solid #CC00CC;
+    padding: 5px;
+  }
+
+  .file-explorer-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .modal {
+    width: 100%; /* Stretch modal to full width */
+    max-width: 95%;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .file {
+    font-size: 12px;
+  }
+
+  .upload-button,
+  .create-button,
+  .delete-button {
+    font-size: 12px;
+    padding: 4px 8px;
+  }
+
+  .modal-content .input,
+  .modal-content .textarea {
+    font-size: 12px;
+  }
 }
 </style>
 
 
 DirectoryTree : 
+
 <template>
     <div class="directory-tree">
       <ul>
@@ -495,7 +763,7 @@ DirectoryTree :
 
   CrudOperations : 
 
-  <template>
+<template>
     <div class="crud-operations">
       <h3>CRUD Operations</h3>
   
@@ -552,25 +820,24 @@ DirectoryTree :
         }
       },
       async createDocument() {
-        try {
-          const newDoc = {
-            name: `Document_${Date.now()}`,
-            title: "Sample Document",
-            content: "This is a sample document content.",
-          };
-          const response = await axios.post(
-            "http://localhost:8080/api/documents",
-            newDoc,
-            {
-              auth: { username: "admin", password: "admin123" },
-            }
-          );
-          console.log("Document created:", response.data);
-          this.fetchDocuments(); // Refresh the list
-        } catch (error) {
-          console.error("Error creating document:", error);
-        }
-      },
+  try {
+    const newDoc = {
+      name: `Document_${Date.now()}`,
+      title: "Sample Document",
+      content: "This is a sample document content.",
+      type: "FILE", // Default type
+    };
+    const response = await axios.post("http://localhost:8080/api/documents", newDoc, {
+      auth: { username: "admin", password: "admin123" },
+    });
+    console.log("Document created:", response.data);
+    this.$emit("update-files", [...this.documents, response.data]); // Sync with parent
+  } catch (error) {
+    console.error("Error creating document:", error);
+    alert("Failed to create document. Please try again.");
+  }
+}
+,
       async fetchDocumentById() {
         try {
           const response = await axios.get(
@@ -606,9 +873,8 @@ DirectoryTree :
     background-color: #f9f9f9;
   }
   </style>
-  
 
-  AdminLogin :
+  AdminLogin : 
 
   <template>
     <div class="modal">
@@ -644,3 +910,6 @@ DirectoryTree :
   }
   </style>
   
+
+  
+

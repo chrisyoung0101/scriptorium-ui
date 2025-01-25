@@ -46,8 +46,12 @@
     methods: {
       async fetchDocuments() {
         try {
-          const response = await axios.get("http://localhost:8080/api/documents", {
-            auth: { username: "admin", password: "admin123" },
+          const response = await axios.get(`${process.env.VUE_APP_API_URL}/api/documents`, 
+          {
+            auth: { 
+              username: process.env.VUE_APP_API_USERNAME,
+              password: process.env.VUE_APP_API_PASSWORD, 
+            },
           });
           this.documents = response.data;
         } catch (error) {
@@ -62,8 +66,10 @@
       content: "This is a sample document content.",
       type: "FILE", // Default type
     };
-    const response = await axios.post("http://localhost:8080/api/documents", newDoc, {
-      auth: { username: "admin", password: "admin123" },
+    const response = await axios.post(`${process.env.VUE_APP_API_URL}/api/documents`, newDoc, {
+      auth: { username: process.env.VUE_APP_API_USERNAME,
+              password: process.env.VUE_APP_API_PASSWORD, 
+            },
     });
     console.log("Document created:", response.data);
     this.$emit("update-files", [...this.documents, response.data]); // Sync with parent
@@ -76,9 +82,13 @@
       async fetchDocumentById() {
         try {
           const response = await axios.get(
-            `http://localhost:8080/api/documents/${this.fetchId}`,
-            { auth: { username: "admin", password: "admin123" } }
-          );
+            `${process.env.VUE_APP_API_URL}/api/documents/${this.fetchId}`,
+            {       
+              auth: { 
+                username: process.env.VUE_APP_API_USERNAME,
+                password: process.env.VUE_APP_API_PASSWORD, 
+              }, 
+          });
           this.documentById = response.data;
         } catch (error) {
           console.error("Error fetching document by ID:", error);
@@ -87,8 +97,12 @@
       async deleteDocument() {
         try {
           await axios.delete(
-            `http://localhost:8080/api/documents/${this.deleteId}`,
-            { auth: { username: "admin", password: "admin123" } }
+            `${process.env.VUE_APP_API_URL}/api/documents/${this.deleteId}`,
+            { 
+              auth: { 
+                username: process.env.VUE_APP_API_USERNAME,
+                password: process.env.VUE_APP_API_PASSWORD, 
+              } }
           );
           console.log(`Document with ID ${this.deleteId} deleted.`);
           this.fetchDocuments(); // Refresh the list
