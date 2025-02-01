@@ -56,18 +56,26 @@ export default {
      * Fetches children of a folder from the API.
      * @param {Object} folder - The folder whose children are to be loaded.
      */
-    async loadChildren(folder) {
-      try {
-        const response = await axios.get(`${process.env.VUE_APP_API_URL}/api/documents/${folder.id}/children`);
-        folder.children = response.data.map((child) => ({
-          ...child,
-          expanded: false, // Initialize all folders as collapsed
-        }));
-      } catch (error) {
-        console.error("Error loading folder contents:", error);
-        alert(`Failed to load contents for folder: ${folder.name}`);
+     async loadChildren(folder) {
+  try {
+    const response = await axios.get(
+      `${process.env.VUE_APP_API_URL}/api/documents/${folder.id}/children`,
+      {
+        auth: {
+          username: process.env.VUE_APP_API_USERNAME,
+          password: process.env.VUE_APP_API_PASSWORD,
+        },
       }
-    },
+    );
+    folder.children = response.data.map((child) => ({
+      ...child,
+      expanded: false, // Initialize all folders as collapsed
+    }));
+  } catch (error) {
+    console.error("Error loading folder contents:", error);
+    alert(`Failed to load contents for folder: ${folder.name}`);
+  }
+},
   },
 };
 </script>

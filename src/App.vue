@@ -126,22 +126,25 @@ export default {
    * Fetch the list of files/documents from the backend API.
    * Maps the backend response to the format expected by the UI.
    */
-  async fetchFiles() {
-    try {
-      const response = await axios.get(`${process.env.VUE_APP_API_URL}/api/documents` , {
-        headers: { Authorization: "Basic YWRtaW46YWRtaW4=" }, // Replace with valid credentials
-      });
-      // Map the response data to the file structure used in the UI
-      this.files = response.data.map((doc) => ({
-        id: doc.id,
-        name: doc.name,
-        content: doc.content,
-      }));
-    } catch (error) {
-      console.error("Error fetching documents:", error);
-      this.handleError("Failed to fetch files from the database.");
-    }
-  },
+   async fetchFiles() {
+  try {
+    const response = await axios.get(`${process.env.VUE_APP_API_URL}/api/documents`, {
+      auth: {
+        username: process.env.VUE_APP_API_USERNAME,
+        password: process.env.VUE_APP_API_PASSWORD,
+      },
+    });
+    // Map the response data to the file structure used in the UI
+    this.files = response.data.map((doc) => ({
+      id: doc.id,
+      name: doc.name,
+      content: doc.content,
+    }));
+  } catch (error) {
+    console.error("Error fetching documents:", error);
+    this.handleError("Failed to fetch files from the database.");
+  }
+},
 
   /**
    * Update the list of files in the UI after changes (e.g., file upload, CRUD operations).

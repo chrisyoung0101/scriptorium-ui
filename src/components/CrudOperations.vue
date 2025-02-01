@@ -45,19 +45,24 @@
     },
     methods: {
       async fetchDocuments() {
-        try {
-          const response = await axios.get(`${process.env.VUE_APP_API_URL}/api/documents`, 
-          {
-            auth: { 
-              username: process.env.VUE_APP_API_USERNAME,
-              password: process.env.VUE_APP_API_PASSWORD, 
-            },
-          });
-          this.documents = response.data;
-        } catch (error) {
-          console.error("Error fetching documents:", error);
-        }
+  try {
+    const response = await axios.get(`${process.env.VUE_APP_API_URL}/api/documents`, {
+      auth: {
+        username: process.env.VUE_APP_API_USERNAME,
+        password: process.env.VUE_APP_API_PASSWORD,
       },
+    });
+    // Map the response data to a readable structure for display
+    this.documents = response.data.map((doc) => ({
+      id: doc.id,
+      name: doc.name,
+      title: doc.title,
+    }));
+  } catch (error) {
+    console.error("Error fetching documents:", error);
+    alert("Failed to fetch documents. Please try again later.");
+  }
+},
       async createDocument() {
   try {
     const newDoc = {

@@ -79,33 +79,38 @@ export default {
 
     // Handle file upload (already implemented)
     handleFileUpload(event) {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = async (e) => {
-          const content = e.target.result; // File content
-          const newFile = { name: file.name, content };
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const content = e.target.result; // File content
+      const newFile = { name: file.name, content };
 
-          try {
-            // Save to database
-            await axios.post(`${process.env.VUE_APP_API_URL}/api/documents`, {
-              name: file.name,
-              title: file.name,
-              content,
-              type: "FILE",
-            });
-            alert(`File "${file.name}" uploaded successfully.`);
+      try {
+        // Save to the backend
+        await axios.post(`${process.env.VUE_APP_API_URL}/api/documents`, {
+          name: file.name,
+          title: file.name,
+          content,
+          type: "FILE",
+        }, {
+          auth: {
+            username: process.env.VUE_APP_API_USERNAME,
+            password: process.env.VUE_APP_API_PASSWORD,
+          },
+        });
 
-            // Refresh file list
-            this.$emit("update-files", [...this.files, newFile]);
-          } catch (error) {
-            console.error("Error uploading file:", error);
-            alert("Failed to upload the file.");
-          }
-        };
-        reader.readAsText(file);
+        alert(`File "${file.name}" uploaded successfully.`);
+        // Refresh file list
+        this.$emit("update-files", [...this.files, newFile]);
+      } catch (error) {
+        console.error("Error uploading file:", error);
+        alert("Failed to upload the file.");
       }
-    },
+    };
+    reader.readAsText(file);
+  }
+},
 
     // Select a file and notify the parent for display
     selectFile(file) {
@@ -114,17 +119,22 @@ export default {
 
     // Delete a file or folder from the database
     async deleteFile(fileId) {
-      try {
-        await axios.delete(`${process.env.VUE_APP_API_URL}/api/documents/${fileId}`);
-        alert("File or folder deleted successfully.");
+  try {
+    await axios.delete(`${process.env.VUE_APP_API_URL}/api/documents/${fileId}`, {
+      auth: {
+        username: process.env.VUE_APP_API_USERNAME,
+        password: process.env.VUE_APP_API_PASSWORD,
+      },
+    });
 
-        // Update the file list
-        this.$emit("update-files", this.files.filter((file) => file.id !== fileId));
-      } catch (error) {
-        console.error("Error deleting file or folder:", error);
-        alert("Failed to delete the file or folder.");
-      }
-    },
+    alert("File or folder deleted successfully.");
+    // Update the file list
+    this.$emit("update-files", this.files.filter((file) => file.id !== fileId));
+  } catch (error) {
+    console.error("Error deleting file or folder:", error);
+    alert("Failed to delete the file or folder.");
+  }
+},
 
     // Open the "Create" modal
     openCreateModal() {
@@ -140,31 +150,35 @@ export default {
 
     // Create a new file and save it to the database
     async createNewFile() {
-      if (!this.newFileName.trim()) {
-        alert("File name is required.");
-        return;
-      }
+  if (!this.newFileName.trim()) {
+    alert("File name is required.");
+    return;
+  }
 
-      try {
-        const response = await axios.post(`${process.env.VUE_APP_API_URL}/api/documents`, {
-          name: this.newFileName.trim(),
-          title: this.newFileName.trim(),
-          content: this.newFileContent,
-          type: "FILE",
-        });
+  try {
+    const response = await axios.post(`${process.env.VUE_APP_API_URL}/api/documents`, {
+      name: this.newFileName.trim(),
+      title: this.newFileName.trim(),
+      content: this.newFileContent,
+      type: "FILE",
+    }, {
+      auth: {
+        username: process.env.VUE_APP_API_USERNAME,
+        password: process.env.VUE_APP_API_PASSWORD,
+      },
+    });
 
-        alert(`File "${this.newFileName}" created successfully.`);
+    alert(`File "${this.newFileName}" created successfully.`);
+    // Add the new file to the file list
+    this.$emit("update-files", [...this.files, response.data]);
 
-        // Add the new file to the file list
-        this.$emit("update-files", [...this.files, response.data]);
-
-        // Close the modal and reset the input fields
-        this.closeCreateModal();
-      } catch (error) {
-        console.error("Error creating new file:", error);
-        alert("Failed to create the file.");
-      }
-    },
+    // Close the modal and reset input fields
+    this.closeCreateModal();
+  } catch (error) {
+    console.error("Error creating new file:", error);
+    alert("Failed to create the file.");
+  }
+},
   },
 };
 </script>
