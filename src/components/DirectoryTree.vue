@@ -58,10 +58,7 @@ export default {
     async loadChildren(folder) {
       try {
         const response = await axios.get(
-          `${process.env.VUE_APP_API_URL}/api/documents/${folder.id}/children`,
-          {
-            withCredentials: true, // Enable session authentication
-          }
+          `${process.env.VUE_APP_API_URL}/api/documents/${folder.id}/children`
         );
         folder.children = response.data.map((child) => ({
           ...child,

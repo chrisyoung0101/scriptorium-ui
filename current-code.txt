@@ -73,8 +73,9 @@
     </footer>
   </div>
 </template>
+
 <script>
-import axios from "axios"; // Import axios
+import axios from "axios";
 import FileExplorer from './components/FileExplorer.vue';
 import MarkUpViewer from './components/MarkUpViewer.vue';
 import CrudOperations from './components/CrudOperations.vue';
@@ -115,67 +116,61 @@ export default {
     };
   },
   methods: {
-  /**
-   * Global method to handle errors and provide user-friendly feedback.
-   * @param {string} message - The error message to display to the user.
-   */
-  handleError(message) {
-    alert(message); // Display an alert for now. Can be extended to a toast or notification system.
-  },
+    /**
+     * Global method to handle errors and provide user-friendly feedback.
+     * @param {string} message - The error message to display to the user.
+     */
+    handleError(message) {
+      alert(message); // Display an alert for now. Can be extended to a toast or notification system.
+    },
 
-  /**
-   * Fetch the list of files/documents from the backend API.
-   * Maps the backend response to the format expected by the UI.
-   */
-   async fetchFiles() {
-  try {
-    const response = await axios.get(`${process.env.VUE_APP_API_URL}/api/documents`, {
-      auth: {
-        username: process.env.VUE_APP_API_USERNAME,
-        password: process.env.VUE_APP_API_PASSWORD,
-      },
-    });
-    // Map the response data to the file structure used in the UI
-    this.files = response.data.map((doc) => ({
-      id: doc.id,
-      name: doc.name,
-      content: doc.content,
-    }));
-  } catch (error) {
-    console.error("Error fetching documents:", error);
-    this.handleError("Failed to fetch files from the database.");
-  }
-},
+    /**
+     * Fetch the list of files/documents from the backend API.
+     * Maps the backend response to the format expected by the UI.
+     */
+    async fetchFiles() {
+      try {
+        const response = await axios.get(`${process.env.VUE_APP_API_URL}/api/documents`);
+        // Map the response data to the file structure used in the UI
+        this.files = response.data.map((doc) => ({
+          id: doc.id,
+          name: doc.name,
+          content: doc.content,
+        }));
+      } catch (error) {
+        console.error("Error fetching documents:", error);
+        this.handleError("Failed to fetch files from the database.");
+      }
+    },
 
-  /**
-   * Update the list of files in the UI after changes (e.g., file upload, CRUD operations).
-   * @param {Array} newFiles - The updated list of files.
-   */
-  updateFiles(newFiles) {
-    this.files = newFiles; // Update the file list globally
-  },
+    /**
+     * Update the list of files in the UI after changes (e.g., file upload, CRUD operations).
+     * @param {Array} newFiles - The updated list of files.
+     */
+    updateFiles(newFiles) {
+      this.files = newFiles; // Update the file list globally
+    },
 
-  /**
-   * Display the content of a selected file in the viewer.
-   * @param {Object} file - The selected file object.
-   */
-  viewFileContent(file) {
-    this.selectedFileContent = file.content || "Unable to load content.";
-  },
+    /**
+     * Display the content of a selected file in the viewer.
+     * @param {Object} file - The selected file object.
+     */
+    viewFileContent(file) {
+      this.selectedFileContent = file.content || "Unable to load content.";
+    },
 
-  /**
-   * Show the admin login modal or prompt.
-   */
-  showAdminLogin() {
-    alert("Admin Login Clicked");
+    /**
+     * Show the admin login modal or prompt.
+     */
+    showAdminLogin() {
+      alert("Admin Login Clicked");
+    },
   },
-},
   created() {
     this.fetchFiles(); // Fetch files when the app is created
   },
 };
 </script>
-
 
 <style>
 /* Enable global scrolling */
@@ -205,7 +200,7 @@ header {
 .layout {
   display: flex;
   height: calc(100vh - 100px); /* Full height minus header/footer */
-  border: 2px solid #fff; /* Add white border between sections */
+  border: 2px solid #fff;
   border-width: 0 2px;
   padding: 0; /* Remove extra padding to align content */
   overflow: hidden; /* Prevent content spilling */
@@ -243,39 +238,11 @@ header {
   color: #ccc;
   padding: 10px;
   border-left: 3px solid #CC00CC;
-  overflow-y: auto; /* Prevent vertical overflow */
+  overflow-y: auto;
   font-family: "Courier New", monospace;
   white-space: pre-wrap;
   word-wrap: break-word; /* Prevent text spilling horizontally */
   box-sizing: border-box; /* Ensure padding is included within width/height */
-}
-
-.markup-viewer h1,
-.markup-viewer h2,
-.markup-viewer h3 {
-  color: #fff;
-}
-
-.markup-viewer p {
-  color: #ccc;
-}
-
-.markup-viewer code {
-  background-color: #333;
-  color: #00ff00;
-  padding: 2px 4px;
-  border-radius: 3px;
-  font-family: "Courier New", monospace;
-}
-
-/* CRUD Section */
-.crud-section {
-  margin: 20px auto;
-  padding: 20px;
-  background-color: #f4f4f4;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  width: 90%;
 }
 
 /* Footer */
@@ -302,58 +269,7 @@ footer {
   margin-right: 15px;
   cursor: pointer;
 }
-
-/* Responsive Adjustments */
-@media screen and (max-width: 768px) {
-  .layout {
-    flex-direction: column; /* Stack sections vertically */
-  }
-
-  .directory-sidebar,
-  .file-explorer,
-  .markup-viewer {
-    width: 100%; /* Full width for all sections */
-    height: auto; /* Allow natural height */
-  }
-
-  .markup-viewer {
-    padding: 10px; /* Improve readability */
-  }
-
-  .crud-section {
-    width: 100%; /* Expand CRUD section to full width */
-  }
-}
-
-@media screen and (max-width: 480px) {
-  .header-title {
-    font-size: 20px;
-    letter-spacing: 3px;
-  }
-
-  .directory-sidebar {
-    padding: 5px;
-    font-size: 12px; /* Adjust font size for smaller screens */
-  }
-
-  .file-explorer {
-    font-size: 12px;
-    padding: 5px;
-  }
-
-  .markup-viewer {
-    font-size: 14px;
-    word-wrap: break-word; /* Ensure content breaks on smaller screens */
-  }
-
-  .footer-colors .color-block {
-    height: 20px; /* Reduce block height in the footer */
-  }
-}
-
-
 </style>
-
 
 
 --- MarkUpViewer.vue (/Users/chrisyoung/scriptorium/src/components/MarkUpViewer.vue) ---
@@ -419,10 +335,10 @@ export default {
   <div class="file-explorer">
     <div class="file-explorer-header">
       <h3>File Explorer</h3>
-      <!-- Existing Upload Button -->
+      <!-- Upload Button -->
       <button class="upload-button" @click="triggerFileUpload">Upload</button>
 
-      <!-- New Create Button -->
+      <!-- Create Button -->
       <button class="create-button" @click="openCreateModal">Create</button>
 
       <!-- Hidden File Input for Upload -->
@@ -439,7 +355,7 @@ export default {
     <ul>
       <li
         v-for="file in files"
-        :key="file.name"
+        :key="file.id"
         class="file"
         @click="selectFile(file)"
       >
@@ -448,26 +364,25 @@ export default {
       </li>
     </ul>
 
-<!-- Modal for Creating a New File -->
-<div v-if="showCreateModal" class="modal-overlay">
-  <div class="modal">
-    <h3>Create New Document</h3>
-    <input
-      v-model="newFileName"
-      placeholder="Enter file name"
-    />
-    <textarea
-      v-model="newFileContent"
-      placeholder="Enter file content"
-      rows="5"
-    ></textarea>
-    <div class="modal-actions">
-      <button @click="createNewFile">Save</button>
-      <button @click="closeCreateModal">Cancel</button>
+    <!-- Modal for Creating a New File -->
+    <div v-if="showCreateModal" class="modal-overlay">
+      <div class="modal">
+        <h3>Create New Document</h3>
+        <input
+          v-model="newFileName"
+          placeholder="Enter file name"
+        />
+        <textarea
+          v-model="newFileContent"
+          placeholder="Enter file content"
+          rows="5"
+        ></textarea>
+        <div class="modal-actions">
+          <button @click="createNewFile">Save</button>
+          <button @click="closeCreateModal">Cancel</button>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
-
   </div>
 </template>
 
@@ -483,9 +398,9 @@ export default {
   },
   data() {
     return {
-      showCreateModal: false, // Controls visibility of the "Create" modal
-      newFileName: "", // Stores the new file's name
-      newFileContent: "", // Stores the new file's content
+      showCreateModal: false,
+      newFileName: "",
+      newFileContent: "",
     };
   },
   methods: {
@@ -494,64 +409,52 @@ export default {
       this.$refs.fileInput.click();
     },
 
-    // Handle file upload (already implemented)
-    handleFileUpload(event) {
-  const file = event.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      const content = e.target.result; // File content
-      const newFile = { name: file.name, content };
+    // Handle file upload
+    async handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+          const content = e.target.result;
+          const newFile = { name: file.name, content };
 
-      try {
-        // Save to the backend
-        await axios.post(`${process.env.VUE_APP_API_URL}/api/documents`, {
-          name: file.name,
-          title: file.name,
-          content,
-          type: "FILE",
-        }, {
-          auth: {
-            username: process.env.VUE_APP_API_USERNAME,
-            password: process.env.VUE_APP_API_PASSWORD,
-          },
-        });
+          try {
+            // Save to the backend
+            await axios.post(`${process.env.VUE_APP_API_URL}/api/documents`, {
+              name: file.name,
+              title: file.name,
+              content,
+              type: "FILE",
+            });
 
-        alert(`File "${file.name}" uploaded successfully.`);
-        // Refresh file list
-        this.$emit("update-files", [...this.files, newFile]);
-      } catch (error) {
-        console.error("Error uploading file:", error);
-        alert("Failed to upload the file.");
+            alert(`File "${file.name}" uploaded successfully.`);
+            this.$emit("update-files", [...this.files, newFile]);
+          } catch (error) {
+            console.error("Error uploading file:", error);
+            alert("Failed to upload the file.");
+          }
+        };
+        reader.readAsText(file);
       }
-    };
-    reader.readAsText(file);
-  }
-},
+    },
 
     // Select a file and notify the parent for display
     selectFile(file) {
       this.$emit("select-file", file);
     },
 
-    // Delete a file or folder from the database
+    // Delete a file from the database
     async deleteFile(fileId) {
-  try {
-    await axios.delete(`${process.env.VUE_APP_API_URL}/api/documents/${fileId}`, {
-      auth: {
-        username: process.env.VUE_APP_API_USERNAME,
-        password: process.env.VUE_APP_API_PASSWORD,
-      },
-    });
+      try {
+        await axios.delete(`${process.env.VUE_APP_API_URL}/api/documents/${fileId}`);
 
-    alert("File or folder deleted successfully.");
-    // Update the file list
-    this.$emit("update-files", this.files.filter((file) => file.id !== fileId));
-  } catch (error) {
-    console.error("Error deleting file or folder:", error);
-    alert("Failed to delete the file or folder.");
-  }
-},
+        alert("File deleted successfully.");
+        this.$emit("update-files", this.files.filter((file) => file.id !== fileId));
+      } catch (error) {
+        console.error("Error deleting file:", error);
+        alert("Failed to delete the file.");
+      }
+    },
 
     // Open the "Create" modal
     openCreateModal() {
@@ -567,40 +470,102 @@ export default {
 
     // Create a new file and save it to the database
     async createNewFile() {
-  if (!this.newFileName.trim()) {
-    alert("File name is required.");
-    return;
-  }
+      if (!this.newFileName.trim()) {
+        alert("File name is required.");
+        return;
+      }
 
-  try {
-    const response = await axios.post(`${process.env.VUE_APP_API_URL}/api/documents`, {
-      name: this.newFileName.trim(),
-      title: this.newFileName.trim(),
-      content: this.newFileContent,
-      type: "FILE",
-    }, {
-      auth: {
-        username: process.env.VUE_APP_API_USERNAME,
-        password: process.env.VUE_APP_API_PASSWORD,
-      },
-    });
+      try {
+        const response = await axios.post(`${process.env.VUE_APP_API_URL}/api/documents`, {
+          name: this.newFileName.trim(),
+          title: this.newFileName.trim(),
+          content: this.newFileContent,
+          type: "FILE",
+        });
 
-    alert(`File "${this.newFileName}" created successfully.`);
-    // Add the new file to the file list
-    this.$emit("update-files", [...this.files, response.data]);
+        alert(`File "${this.newFileName}" created successfully.`);
+        this.$emit("update-files", [...this.files, response.data]);
 
-    // Close the modal and reset input fields
-    this.closeCreateModal();
-  } catch (error) {
-    console.error("Error creating new file:", error);
-    alert("Failed to create the file.");
-  }
-},
+        this.closeCreateModal();
+      } catch (error) {
+        console.error("Error creating new file:", error);
+        alert("Failed to create the file.");
+      }
+    },
   },
 };
 </script>
 
 <style>
+/* File Explorer Styling */
+.file-explorer {
+  width: 20%;
+  height: 100%;
+  background-color: #000;
+  color: #CC00CC;
+  border-right: 3px solid #CC00CC;
+  padding: 10px;
+  box-sizing: border-box;
+  overflow: auto;
+}
+
+/* File Explorer Header */
+.file-explorer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+/* Buttons */
+.upload-button,
+.create-button {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.upload-button {
+  background-color: #3CB371;
+  color: white;
+}
+
+.create-button {
+  background-color: #228B22;
+  color: white;
+}
+
+/* File List */
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.file {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px;
+  cursor: pointer;
+  border-bottom: 1px solid #ccc;
+}
+
+.file:hover {
+  background-color: #444;
+}
+
+/* Delete Button */
+.delete-button {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 3px 7px;
+  cursor: pointer;
+  border-radius: 3px;
+}
+
 /* Modal and Overlay Styles */
 .modal-overlay {
   position: fixed;
@@ -608,7 +573,7 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* Background dimming */
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -619,10 +584,10 @@ export default {
   background: white;
   padding: 20px;
   border-radius: 12px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.25); /* Add depth */
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.25);
   width: 400px;
   max-width: 90%;
-  animation: fadeIn 0.3s ease-in-out; /* Smooth fade-in animation */
+  animation: fadeIn 0.3s ease-in-out;
 }
 
 .modal h3 {
@@ -646,12 +611,12 @@ export default {
 }
 
 .modal-actions button:first-child {
-  background-color: #4CAF50; /* Save button */
+  background-color: #4CAF50;
   color: white;
 }
 
 .modal-actions button:last-child {
-  background-color: #f44336; /* Cancel button */
+  background-color: #f44336;
   color: white;
 }
 
@@ -698,7 +663,6 @@ export default {
   </div>
 </template>
 
-  
 <script>
 import axios from "axios";
 
@@ -718,12 +682,12 @@ export default {
      */
     async handleClick(item) {
       if (item.type === "FOLDER") {
-        item.expanded = !item.expanded; // Toggle folder state
+        item.expanded = !item.expanded;
         if (item.expanded && !item.children) {
-          await this.loadChildren(item); // Load children dynamically if not already loaded
+          await this.loadChildren(item);
         }
       } else if (item.type === "FILE") {
-        this.$emit("select-file", item); // Emit selected file to parent
+        this.$emit("select-file", item);
       }
     },
 
@@ -731,31 +695,24 @@ export default {
      * Fetches children of a folder from the API.
      * @param {Object} folder - The folder whose children are to be loaded.
      */
-     async loadChildren(folder) {
-  try {
-    const response = await axios.get(
-      `${process.env.VUE_APP_API_URL}/api/documents/${folder.id}/children`,
-      {
-        auth: {
-          username: process.env.VUE_APP_API_USERNAME,
-          password: process.env.VUE_APP_API_PASSWORD,
-        },
+    async loadChildren(folder) {
+      try {
+        const response = await axios.get(
+          `${process.env.VUE_APP_API_URL}/api/documents/${folder.id}/children`
+        );
+        folder.children = response.data.map((child) => ({
+          ...child,
+          expanded: false,
+        }));
+      } catch (error) {
+        console.error("Error loading folder contents:", error);
+        alert(`Failed to load contents for folder: ${folder.name}`);
       }
-    );
-    folder.children = response.data.map((child) => ({
-      ...child,
-      expanded: false, // Initialize all folders as collapsed
-    }));
-  } catch (error) {
-    console.error("Error loading folder contents:", error);
-    alert(`Failed to load contents for folder: ${folder.name}`);
-  }
-},
+    },
   },
 };
 </script>
 
-  
 <style>
 .directory-tree {
   width: 250px;
@@ -802,139 +759,143 @@ ul {
 }
 </style>
 
-  
 
 --- CrudOperations.vue (/Users/chrisyoung/scriptorium/src/components/CrudOperations.vue) ---
 <template>
-    <div class="crud-operations">
-      <h3>CRUD Operations</h3>
-  
-      <!-- Fetch All Documents -->
-      <button @click="fetchDocuments">Get All Documents</button>
-      <ul v-if="documents.length">
-        <li v-for="doc in documents" :key="doc.id">
-          ID: {{ doc.id }}, Name: {{ doc.name }}, Title: {{ doc.title }}
-        </li>
-      </ul>
-  
-      <!-- Create New Document -->
-      <button @click="createDocument">Create Document</button>
-  
-      <!-- Get Document by ID -->
-      <div>
-        <input v-model="fetchId" placeholder="Enter ID to fetch" />
-        <button @click="fetchDocumentById">Get Document by ID</button>
-        <p v-if="documentById">
-          ID: {{ documentById.id }}, Name: {{ documentById.name }},
-          Title: {{ documentById.title }}
-        </p>
-      </div>
-  
-      <!-- Delete Document -->
-      <div>
-        <input v-model="deleteId" placeholder="Enter ID to delete" />
-        <button @click="deleteDocument">Delete Document</button>
-      </div>
+  <div class="crud-operations">
+    <h3>CRUD Operations</h3>
+
+    <!-- Fetch All Documents -->
+    <button @click="fetchDocuments">Get All Documents</button>
+    <ul v-if="documents.length">
+      <li v-for="doc in documents" :key="doc.id">
+        ID: {{ doc.id }}, Name: {{ doc.name }}, Title: {{ doc.title }}
+      </li>
+    </ul>
+
+    <!-- Create New Document -->
+    <button @click="createDocument">Create Document</button>
+
+    <!-- Get Document by ID -->
+    <div>
+      <input v-model="fetchId" placeholder="Enter ID to fetch" />
+      <button @click="fetchDocumentById">Get Document by ID</button>
+      <p v-if="documentById">
+        ID: {{ documentById.id }}, Name: {{ documentById.name }},
+        Title: {{ documentById.title }}
+      </p>
     </div>
-  </template>
-  
-  <script>
-  import axios from "axios";
-  
-  export default {
-    data() {
-      return {
-        documents: [],
-        fetchId: "",
-        deleteId: "",
-        documentById: null,
-      };
-    },
-    methods: {
-      async fetchDocuments() {
-  try {
-    const response = await axios.get(`${process.env.VUE_APP_API_URL}/api/documents`, {
-      auth: {
-        username: process.env.VUE_APP_API_USERNAME,
-        password: process.env.VUE_APP_API_PASSWORD,
-      },
-    });
-    // Map the response data to a readable structure for display
-    this.documents = response.data.map((doc) => ({
-      id: doc.id,
-      name: doc.name,
-      title: doc.title,
-    }));
-  } catch (error) {
-    console.error("Error fetching documents:", error);
-    alert("Failed to fetch documents. Please try again later.");
-  }
-},
-      async createDocument() {
-  try {
-    const newDoc = {
-      name: `Document_${Date.now()}`,
-      title: "Sample Document",
-      content: "This is a sample document content.",
-      type: "FILE", // Default type
+
+    <!-- Delete Document -->
+    <div>
+      <input v-model="deleteId" placeholder="Enter ID to delete" />
+      <button @click="deleteDocument">Delete Document</button>
+    </div>
+  </div>
+</template>
+
+<script>
+import axios from "axios";
+
+export default {
+  data() {
+    return {
+      documents: [],
+      fetchId: "",
+      deleteId: "",
+      documentById: null,
     };
-    const response = await axios.post(`${process.env.VUE_APP_API_URL}/api/documents`, newDoc, {
-      auth: { username: process.env.VUE_APP_API_USERNAME,
-              password: process.env.VUE_APP_API_PASSWORD, 
-            },
-    });
-    console.log("Document created:", response.data);
-    this.$emit("update-files", [...this.documents, response.data]); // Sync with parent
-  } catch (error) {
-    console.error("Error creating document:", error);
-    alert("Failed to create document. Please try again.");
-  }
-}
-,
-      async fetchDocumentById() {
-        try {
-          const response = await axios.get(
-            `${process.env.VUE_APP_API_URL}/api/documents/${this.fetchId}`,
-            {       
-              auth: { 
-                username: process.env.VUE_APP_API_USERNAME,
-                password: process.env.VUE_APP_API_PASSWORD, 
-              }, 
-          });
-          this.documentById = response.data;
-        } catch (error) {
-          console.error("Error fetching document by ID:", error);
-        }
-      },
-      async deleteDocument() {
-        try {
-          await axios.delete(
-            `${process.env.VUE_APP_API_URL}/api/documents/${this.deleteId}`,
-            { 
-              auth: { 
-                username: process.env.VUE_APP_API_USERNAME,
-                password: process.env.VUE_APP_API_PASSWORD, 
-              } }
-          );
-          console.log(`Document with ID ${this.deleteId} deleted.`);
-          this.fetchDocuments(); // Refresh the list
-        } catch (error) {
-          console.error("Error deleting document:", error);
-        }
-      },
+  },
+  methods: {
+    async fetchDocuments() {
+      try {
+        const response = await axios.get(`${process.env.VUE_APP_API_URL}/api/documents`);
+        this.documents = response.data.map((doc) => ({
+          id: doc.id,
+          name: doc.name,
+          title: doc.title,
+        }));
+      } catch (error) {
+        console.error("Error fetching documents:", error);
+        alert("Failed to fetch documents. Please try again later.");
+      }
     },
-  };
-  </script>
-  
-  <style>
-  .crud-operations {
-    padding: 20px;
-    border: 1px solid #ccc;
-    margin: 16px;
-    background-color: #f9f9f9;
-  }
-  </style>
-  
+
+    async createDocument() {
+      try {
+        const newDoc = {
+          name: `Document_${Date.now()}`,
+          title: "Sample Document",
+          content: "This is a sample document content.",
+          type: "FILE",
+        };
+        const response = await axios.post(`${process.env.VUE_APP_API_URL}/api/documents`, newDoc);
+        this.documents.push(response.data);
+        alert(`Document "${newDoc.name}" created successfully.`);
+      } catch (error) {
+        console.error("Error creating document:", error);
+        alert("Failed to create document. Please try again.");
+      }
+    },
+
+    async fetchDocumentById() {
+      try {
+        const response = await axios.get(
+          `${process.env.VUE_APP_API_URL}/api/documents/${this.fetchId}`
+        );
+        this.documentById = response.data;
+      } catch (error) {
+        console.error("Error fetching document by ID:", error);
+        alert("Failed to fetch document.");
+      }
+    },
+
+    async deleteDocument() {
+      try {
+        await axios.delete(
+          `${process.env.VUE_APP_API_URL}/api/documents/${this.deleteId}`
+        );
+        this.documents = this.documents.filter((doc) => doc.id !== this.deleteId);
+        alert(`Document with ID ${this.deleteId} deleted.`);
+      } catch (error) {
+        console.error("Error deleting document:", error);
+        alert("Failed to delete the document.");
+      }
+    },
+  },
+};
+</script>
+
+<style>
+.crud-operations {
+  padding: 20px;
+  border: 1px solid #ccc;
+  margin: 16px;
+  background-color: #f9f9f9;
+}
+
+button {
+  padding: 8px 12px;
+  margin: 5px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #007bff;
+  color: white;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+input {
+  padding: 5px;
+  margin: 5px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}
+</style>
+
 
 --- AdminLoginModal.vue (/Users/chrisyoung/scriptorium/src/components/AdminLoginModal.vue) ---
 <template>
@@ -985,8 +946,6 @@ ul {
 --- .env (/Users/chrisyoung/scriptorium/.env) ---
 # For local development, replace VUE_APP_API_URL value with http://localhost:8081
 VUE_APP_API_URL=https://scriptorium-api.onrender.com
-VUE_APP_API_USERNAME=admin
-VUE_APP_API_PASSWORD=admin123
 
 
 --- vue.config.js (/Users/chrisyoung/scriptorium/vue.config.js) ---

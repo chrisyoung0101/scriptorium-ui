@@ -129,9 +129,7 @@ export default {
      */
     async fetchFiles() {
       try {
-        const response = await axios.get(`${process.env.VUE_APP_API_URL}/api/documents`, {
-          withCredentials: true, // Enable cookies/session authentication
-        });
+        const response = await axios.get(`${process.env.VUE_APP_API_URL}/api/documents`);
         // Map the response data to the file structure used in the UI
         this.files = response.data.map((doc) => ({
           id: doc.id,

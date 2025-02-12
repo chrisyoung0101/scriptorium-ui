@@ -92,8 +92,6 @@ export default {
               title: file.name,
               content,
               type: "FILE",
-            }, {
-              withCredentials: true, // Enable session authentication
             });
 
             alert(`File "${file.name}" uploaded successfully.`);
@@ -115,9 +113,7 @@ export default {
     // Delete a file from the database
     async deleteFile(fileId) {
       try {
-        await axios.delete(`${process.env.VUE_APP_API_URL}/api/documents/${fileId}`, {
-          withCredentials: true, // Enable session authentication
-        });
+        await axios.delete(`${process.env.VUE_APP_API_URL}/api/documents/${fileId}`);
 
         alert("File deleted successfully.");
         this.$emit("update-files", this.files.filter((file) => file.id !== fileId));
@@ -152,8 +148,6 @@ export default {
           title: this.newFileName.trim(),
           content: this.newFileContent,
           type: "FILE",
-        }, {
-          withCredentials: true, // Enable session authentication
         });
 
         alert(`File "${this.newFileName}" created successfully.`);

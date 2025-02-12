@@ -46,9 +46,7 @@ export default {
   methods: {
     async fetchDocuments() {
       try {
-        const response = await axios.get(`${process.env.VUE_APP_API_URL}/api/documents`, {
-          withCredentials: true, // Enable session authentication
-        });
+        const response = await axios.get(`${process.env.VUE_APP_API_URL}/api/documents`);
         this.documents = response.data.map((doc) => ({
           id: doc.id,
           name: doc.name,
@@ -68,9 +66,7 @@ export default {
           content: "This is a sample document content.",
           type: "FILE",
         };
-        const response = await axios.post(`${process.env.VUE_APP_API_URL}/api/documents`, newDoc, {
-          withCredentials: true, // Enable session authentication
-        });
+        const response = await axios.post(`${process.env.VUE_APP_API_URL}/api/documents`, newDoc);
         this.documents.push(response.data);
         alert(`Document "${newDoc.name}" created successfully.`);
       } catch (error) {
@@ -82,10 +78,7 @@ export default {
     async fetchDocumentById() {
       try {
         const response = await axios.get(
-          `${process.env.VUE_APP_API_URL}/api/documents/${this.fetchId}`,
-          {
-            withCredentials: true, // Enable session authentication
-          }
+          `${process.env.VUE_APP_API_URL}/api/documents/${this.fetchId}`
         );
         this.documentById = response.data;
       } catch (error) {
@@ -97,10 +90,7 @@ export default {
     async deleteDocument() {
       try {
         await axios.delete(
-          `${process.env.VUE_APP_API_URL}/api/documents/${this.deleteId}`,
-          {
-            withCredentials: true, // Enable session authentication
-          }
+          `${process.env.VUE_APP_API_URL}/api/documents/${this.deleteId}`
         );
         this.documents = this.documents.filter((doc) => doc.id !== this.deleteId);
         alert(`Document with ID ${this.deleteId} deleted.`);
