@@ -72,8 +72,9 @@
     </footer>
   </div>
 </template>
+
 <script>
-import axios from "axios"; // Import axios
+import axios from "axios";
 import FileExplorer from './components/FileExplorer.vue';
 import MarkUpViewer from './components/MarkUpViewer.vue';
 import CrudOperations from './components/CrudOperations.vue';
@@ -114,67 +115,63 @@ export default {
     };
   },
   methods: {
-  /**
-   * Global method to handle errors and provide user-friendly feedback.
-   * @param {string} message - The error message to display to the user.
-   */
-  handleError(message) {
-    alert(message); // Display an alert for now. Can be extended to a toast or notification system.
-  },
+    /**
+     * Global method to handle errors and provide user-friendly feedback.
+     * @param {string} message - The error message to display to the user.
+     */
+    handleError(message) {
+      alert(message); // Display an alert for now. Can be extended to a toast or notification system.
+    },
 
-  /**
-   * Fetch the list of files/documents from the backend API.
-   * Maps the backend response to the format expected by the UI.
-   */
-   async fetchFiles() {
-  try {
-    const response = await axios.get(`${process.env.VUE_APP_API_URL}/api/documents`, {
-      auth: {
-        username: process.env.VUE_APP_API_USERNAME,
-        password: process.env.VUE_APP_API_PASSWORD,
-      },
-    });
-    // Map the response data to the file structure used in the UI
-    this.files = response.data.map((doc) => ({
-      id: doc.id,
-      name: doc.name,
-      content: doc.content,
-    }));
-  } catch (error) {
-    console.error("Error fetching documents:", error);
-    this.handleError("Failed to fetch files from the database.");
-  }
-},
+    /**
+     * Fetch the list of files/documents from the backend API.
+     * Maps the backend response to the format expected by the UI.
+     */
+    async fetchFiles() {
+      try {
+        const response = await axios.get(`${process.env.VUE_APP_API_URL}/api/documents`, {
+          withCredentials: true, // Enable cookies/session authentication
+        });
+        // Map the response data to the file structure used in the UI
+        this.files = response.data.map((doc) => ({
+          id: doc.id,
+          name: doc.name,
+          content: doc.content,
+        }));
+      } catch (error) {
+        console.error("Error fetching documents:", error);
+        this.handleError("Failed to fetch files from the database.");
+      }
+    },
 
-  /**
-   * Update the list of files in the UI after changes (e.g., file upload, CRUD operations).
-   * @param {Array} newFiles - The updated list of files.
-   */
-  updateFiles(newFiles) {
-    this.files = newFiles; // Update the file list globally
-  },
+    /**
+     * Update the list of files in the UI after changes (e.g., file upload, CRUD operations).
+     * @param {Array} newFiles - The updated list of files.
+     */
+    updateFiles(newFiles) {
+      this.files = newFiles; // Update the file list globally
+    },
 
-  /**
-   * Display the content of a selected file in the viewer.
-   * @param {Object} file - The selected file object.
-   */
-  viewFileContent(file) {
-    this.selectedFileContent = file.content || "Unable to load content.";
-  },
+    /**
+     * Display the content of a selected file in the viewer.
+     * @param {Object} file - The selected file object.
+     */
+    viewFileContent(file) {
+      this.selectedFileContent = file.content || "Unable to load content.";
+    },
 
-  /**
-   * Show the admin login modal or prompt.
-   */
-  showAdminLogin() {
-    alert("Admin Login Clicked");
+    /**
+     * Show the admin login modal or prompt.
+     */
+    showAdminLogin() {
+      alert("Admin Login Clicked");
+    },
   },
-},
   created() {
     this.fetchFiles(); // Fetch files when the app is created
   },
 };
 </script>
-
 
 <style>
 /* Enable global scrolling */
@@ -204,7 +201,7 @@ header {
 .layout {
   display: flex;
   height: calc(100vh - 100px); /* Full height minus header/footer */
-  border: 2px solid #fff; /* Add white border between sections */
+  border: 2px solid #fff;
   border-width: 0 2px;
   padding: 0; /* Remove extra padding to align content */
   overflow: hidden; /* Prevent content spilling */
@@ -242,39 +239,11 @@ header {
   color: #ccc;
   padding: 10px;
   border-left: 3px solid #CC00CC;
-  overflow-y: auto; /* Prevent vertical overflow */
+  overflow-y: auto;
   font-family: "Courier New", monospace;
   white-space: pre-wrap;
   word-wrap: break-word; /* Prevent text spilling horizontally */
   box-sizing: border-box; /* Ensure padding is included within width/height */
-}
-
-.markup-viewer h1,
-.markup-viewer h2,
-.markup-viewer h3 {
-  color: #fff;
-}
-
-.markup-viewer p {
-  color: #ccc;
-}
-
-.markup-viewer code {
-  background-color: #333;
-  color: #00ff00;
-  padding: 2px 4px;
-  border-radius: 3px;
-  font-family: "Courier New", monospace;
-}
-
-/* CRUD Section */
-.crud-section {
-  margin: 20px auto;
-  padding: 20px;
-  background-color: #f4f4f4;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  width: 90%;
 }
 
 /* Footer */
@@ -301,55 +270,4 @@ footer {
   margin-right: 15px;
   cursor: pointer;
 }
-
-/* Responsive Adjustments */
-@media screen and (max-width: 768px) {
-  .layout {
-    flex-direction: column; /* Stack sections vertically */
-  }
-
-  .directory-sidebar,
-  .file-explorer,
-  .markup-viewer {
-    width: 100%; /* Full width for all sections */
-    height: auto; /* Allow natural height */
-  }
-
-  .markup-viewer {
-    padding: 10px; /* Improve readability */
-  }
-
-  .crud-section {
-    width: 100%; /* Expand CRUD section to full width */
-  }
-}
-
-@media screen and (max-width: 480px) {
-  .header-title {
-    font-size: 20px;
-    letter-spacing: 3px;
-  }
-
-  .directory-sidebar {
-    padding: 5px;
-    font-size: 12px; /* Adjust font size for smaller screens */
-  }
-
-  .file-explorer {
-    font-size: 12px;
-    padding: 5px;
-  }
-
-  .markup-viewer {
-    font-size: 14px;
-    word-wrap: break-word; /* Ensure content breaks on smaller screens */
-  }
-
-  .footer-colors .color-block {
-    height: 20px; /* Reduce block height in the footer */
-  }
-}
-
-
 </style>
-

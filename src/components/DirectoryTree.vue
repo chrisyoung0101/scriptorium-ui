@@ -23,7 +23,6 @@
   </div>
 </template>
 
-  
 <script>
 import axios from "axios";
 
@@ -43,12 +42,12 @@ export default {
      */
     async handleClick(item) {
       if (item.type === "FOLDER") {
-        item.expanded = !item.expanded; // Toggle folder state
+        item.expanded = !item.expanded;
         if (item.expanded && !item.children) {
-          await this.loadChildren(item); // Load children dynamically if not already loaded
+          await this.loadChildren(item);
         }
       } else if (item.type === "FILE") {
-        this.$emit("select-file", item); // Emit selected file to parent
+        this.$emit("select-file", item);
       }
     },
 
@@ -56,31 +55,27 @@ export default {
      * Fetches children of a folder from the API.
      * @param {Object} folder - The folder whose children are to be loaded.
      */
-     async loadChildren(folder) {
-  try {
-    const response = await axios.get(
-      `${process.env.VUE_APP_API_URL}/api/documents/${folder.id}/children`,
-      {
-        auth: {
-          username: process.env.VUE_APP_API_USERNAME,
-          password: process.env.VUE_APP_API_PASSWORD,
-        },
+    async loadChildren(folder) {
+      try {
+        const response = await axios.get(
+          `${process.env.VUE_APP_API_URL}/api/documents/${folder.id}/children`,
+          {
+            withCredentials: true, // Enable session authentication
+          }
+        );
+        folder.children = response.data.map((child) => ({
+          ...child,
+          expanded: false,
+        }));
+      } catch (error) {
+        console.error("Error loading folder contents:", error);
+        alert(`Failed to load contents for folder: ${folder.name}`);
       }
-    );
-    folder.children = response.data.map((child) => ({
-      ...child,
-      expanded: false, // Initialize all folders as collapsed
-    }));
-  } catch (error) {
-    console.error("Error loading folder contents:", error);
-    alert(`Failed to load contents for folder: ${folder.name}`);
-  }
-},
+    },
   },
 };
 </script>
 
-  
 <style>
 .directory-tree {
   width: 250px;
@@ -126,5 +121,3 @@ ul {
   font-weight: bold;
 }
 </style>
-
-  

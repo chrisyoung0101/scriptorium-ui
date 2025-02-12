@@ -5,4 +5,8 @@ python3 collect_files.py
 /Users/chrisyoung/scriptorium
 
 
-App.vue,MarkUpViewer.vue,FileExplorer.vue,DirectoryTree.vue,CrudOperations.vue,AdminLoginModal.vue
+App.vue,MarkUpViewer.vue,FileExplorer.vue,DirectoryTree.vue,CrudOperations.vue,AdminLoginModal.vue,.env,vue.config.js
+
+
+CORS issue : 
+App.vue, CrudOperations.vue, FileExplorer.vue, DirectoryTree.vue, .env, vue.config.js

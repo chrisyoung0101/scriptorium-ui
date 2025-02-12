@@ -127,22 +127,25 @@ export default {
    * Fetch the list of files/documents from the backend API.
    * Maps the backend response to the format expected by the UI.
    */
-  async fetchFiles() {
-    try {
-      const response = await axios.get(`${process.env.VUE_APP_API_URL}/api/documents` , {
-        headers: { Authorization: "Basic YWRtaW46YWRtaW4=" }, // Replace with valid credentials
-      });
-      // Map the response data to the file structure used in the UI
-      this.files = response.data.map((doc) => ({
-        id: doc.id,
-        name: doc.name,
-        content: doc.content,
-      }));
-    } catch (error) {
-      console.error("Error fetching documents:", error);
-      this.handleError("Failed to fetch files from the database.");
-    }
-  },
+   async fetchFiles() {
+  try {
+    const response = await axios.get(`${process.env.VUE_APP_API_URL}/api/documents`, {
+      auth: {
+        username: process.env.VUE_APP_API_USERNAME,
+        password: process.env.VUE_APP_API_PASSWORD,
+      },
+    });
+    // Map the response data to the file structure used in the UI
+    this.files = response.data.map((doc) => ({
+      id: doc.id,
+      name: doc.name,
+      content: doc.content,
+    }));
+  } catch (error) {
+    console.error("Error fetching documents:", error);
+    this.handleError("Failed to fetch files from the database.");
+  }
+},
 
   /**
    * Update the list of files in the UI after changes (e.g., file upload, CRUD operations).
@@ -493,33 +496,38 @@ export default {
 
     // Handle file upload (already implemented)
     handleFileUpload(event) {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = async (e) => {
-          const content = e.target.result; // File content
-          const newFile = { name: file.name, content };
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const content = e.target.result; // File content
+      const newFile = { name: file.name, content };
 
-          try {
-            // Save to database
-            await axios.post(`${process.env.VUE_APP_API_URL}/api/documents`, {
-              name: file.name,
-              title: file.name,
-              content,
-              type: "FILE",
-            });
-            alert(`File "${file.name}" uploaded successfully.`);
+      try {
+        // Save to the backend
+        await axios.post(`${process.env.VUE_APP_API_URL}/api/documents`, {
+          name: file.name,
+          title: file.name,
+          content,
+          type: "FILE",
+        }, {
+          auth: {
+            username: process.env.VUE_APP_API_USERNAME,
+            password: process.env.VUE_APP_API_PASSWORD,
+          },
+        });
 
-            // Refresh file list
-            this.$emit("update-files", [...this.files, newFile]);
-          } catch (error) {
-            console.error("Error uploading file:", error);
-            alert("Failed to upload the file.");
-          }
-        };
-        reader.readAsText(file);
+        alert(`File "${file.name}" uploaded successfully.`);
+        // Refresh file list
+        this.$emit("update-files", [...this.files, newFile]);
+      } catch (error) {
+        console.error("Error uploading file:", error);
+        alert("Failed to upload the file.");
       }
-    },
+    };
+    reader.readAsText(file);
+  }
+},
 
     // Select a file and notify the parent for display
     selectFile(file) {
@@ -528,17 +536,22 @@ export default {
 
     // Delete a file or folder from the database
     async deleteFile(fileId) {
-      try {
-        await axios.delete(`${process.env.VUE_APP_API_URL}/api/documents/${fileId}`);
-        alert("File or folder deleted successfully.");
+  try {
+    await axios.delete(`${process.env.VUE_APP_API_URL}/api/documents/${fileId}`, {
+      auth: {
+        username: process.env.VUE_APP_API_USERNAME,
+        password: process.env.VUE_APP_API_PASSWORD,
+      },
+    });
 
-        // Update the file list
-        this.$emit("update-files", this.files.filter((file) => file.id !== fileId));
-      } catch (error) {
-        console.error("Error deleting file or folder:", error);
-        alert("Failed to delete the file or folder.");
-      }
-    },
+    alert("File or folder deleted successfully.");
+    // Update the file list
+    this.$emit("update-files", this.files.filter((file) => file.id !== fileId));
+  } catch (error) {
+    console.error("Error deleting file or folder:", error);
+    alert("Failed to delete the file or folder.");
+  }
+},
 
     // Open the "Create" modal
     openCreateModal() {
@@ -554,31 +567,35 @@ export default {
 
     // Create a new file and save it to the database
     async createNewFile() {
-      if (!this.newFileName.trim()) {
-        alert("File name is required.");
-        return;
-      }
+  if (!this.newFileName.trim()) {
+    alert("File name is required.");
+    return;
+  }
 
-      try {
-        const response = await axios.post(`${process.env.VUE_APP_API_URL}/api/documents`, {
-          name: this.newFileName.trim(),
-          title: this.newFileName.trim(),
-          content: this.newFileContent,
-          type: "FILE",
-        });
+  try {
+    const response = await axios.post(`${process.env.VUE_APP_API_URL}/api/documents`, {
+      name: this.newFileName.trim(),
+      title: this.newFileName.trim(),
+      content: this.newFileContent,
+      type: "FILE",
+    }, {
+      auth: {
+        username: process.env.VUE_APP_API_USERNAME,
+        password: process.env.VUE_APP_API_PASSWORD,
+      },
+    });
 
-        alert(`File "${this.newFileName}" created successfully.`);
+    alert(`File "${this.newFileName}" created successfully.`);
+    // Add the new file to the file list
+    this.$emit("update-files", [...this.files, response.data]);
 
-        // Add the new file to the file list
-        this.$emit("update-files", [...this.files, response.data]);
-
-        // Close the modal and reset the input fields
-        this.closeCreateModal();
-      } catch (error) {
-        console.error("Error creating new file:", error);
-        alert("Failed to create the file.");
-      }
-    },
+    // Close the modal and reset input fields
+    this.closeCreateModal();
+  } catch (error) {
+    console.error("Error creating new file:", error);
+    alert("Failed to create the file.");
+  }
+},
   },
 };
 </script>
@@ -714,18 +731,26 @@ export default {
      * Fetches children of a folder from the API.
      * @param {Object} folder - The folder whose children are to be loaded.
      */
-    async loadChildren(folder) {
-      try {
-        const response = await axios.get(`${process.env.VUE_APP_API_URL}/api/documents/${folder.id}/children`);
-        folder.children = response.data.map((child) => ({
-          ...child,
-          expanded: false, // Initialize all folders as collapsed
-        }));
-      } catch (error) {
-        console.error("Error loading folder contents:", error);
-        alert(`Failed to load contents for folder: ${folder.name}`);
+     async loadChildren(folder) {
+  try {
+    const response = await axios.get(
+      `${process.env.VUE_APP_API_URL}/api/documents/${folder.id}/children`,
+      {
+        auth: {
+          username: process.env.VUE_APP_API_USERNAME,
+          password: process.env.VUE_APP_API_PASSWORD,
+        },
       }
-    },
+    );
+    folder.children = response.data.map((child) => ({
+      ...child,
+      expanded: false, // Initialize all folders as collapsed
+    }));
+  } catch (error) {
+    console.error("Error loading folder contents:", error);
+    alert(`Failed to load contents for folder: ${folder.name}`);
+  }
+},
   },
 };
 </script>
@@ -827,19 +852,24 @@ ul {
     },
     methods: {
       async fetchDocuments() {
-        try {
-          const response = await axios.get(`${process.env.VUE_APP_API_URL}/api/documents`, 
-          {
-            auth: { 
-              username: process.env.VUE_APP_API_USERNAME,
-              password: process.env.VUE_APP_API_PASSWORD, 
-            },
-          });
-          this.documents = response.data;
-        } catch (error) {
-          console.error("Error fetching documents:", error);
-        }
+  try {
+    const response = await axios.get(`${process.env.VUE_APP_API_URL}/api/documents`, {
+      auth: {
+        username: process.env.VUE_APP_API_USERNAME,
+        password: process.env.VUE_APP_API_PASSWORD,
       },
+    });
+    // Map the response data to a readable structure for display
+    this.documents = response.data.map((doc) => ({
+      id: doc.id,
+      name: doc.name,
+      title: doc.title,
+    }));
+  } catch (error) {
+    console.error("Error fetching documents:", error);
+    alert("Failed to fetch documents. Please try again later.");
+  }
+},
       async createDocument() {
   try {
     const newDoc = {
@@ -951,4 +981,36 @@ ul {
   }
   </style>
   
+
+--- .env (/Users/chrisyoung/scriptorium/.env) ---
+# For local development, replace VUE_APP_API_URL value with http://localhost:8081
+VUE_APP_API_URL=https://scriptorium-api.onrender.com
+VUE_APP_API_USERNAME=admin
+VUE_APP_API_PASSWORD=admin123
+
+
+--- vue.config.js (/Users/chrisyoung/scriptorium/vue.config.js) ---
+const { defineConfig } = require('@vue/cli-service')
+module.exports = defineConfig({
+  transpileDependencies: true
+})
+
+
+module.exports = {
+  chainWebpack: (config) => {
+    const svgRule = config.module.rule("svg");
+
+    // Exclude .svg files from the default file loader
+    svgRule.exclude.add(/\.svg$/);
+
+    // Add a new rule for handling .svg files with vue-svg-loader
+    config.module
+      .rule("inline-svg")
+      .test(/\.svg$/)
+      .use("vue-svg-loader")
+      .loader("vue-svg-loader");
+  },
+};
+
+
 
