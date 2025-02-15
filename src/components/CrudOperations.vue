@@ -28,6 +28,12 @@
       <input v-model="deleteId" placeholder="Enter ID to delete" />
       <button @click="deleteDocument">Delete Document</button>
     </div>
+
+    <!-- New: Test Hello Endpoint -->
+    <div>
+      <button @click="helloBackend">Test Hello Endpoint</button>
+      <p v-if="helloMessage">Response: {{ helloMessage }}</p>
+    </div>
   </div>
 </template>
 
@@ -41,6 +47,7 @@ export default {
       fetchId: "",
       deleteId: "",
       documentById: null,
+      helloMessage: "" // new property to store the hello endpoint response
     };
   },
   methods: {
@@ -97,6 +104,18 @@ export default {
       } catch (error) {
         console.error("Error deleting document:", error);
         alert("Failed to delete the document.");
+      }
+    },
+
+    // New method to call the /hello endpoint
+    async helloBackend() {
+      try {
+        const response = await axios.get(`${process.env.VUE_APP_API_URL}/hello`);
+        this.helloMessage = response.data;
+        alert(`Response from backend: ${this.helloMessage}`);
+      } catch (error) {
+        console.error("Error calling hello endpoint:", error);
+        alert("Failed to call hello endpoint.");
       }
     },
   },
