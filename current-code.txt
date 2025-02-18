@@ -964,10 +964,7 @@ input {
 
 --- .env (/Users/chrisyoung/scriptorium/.env) ---
 # For local development, replace VUE_APP_API_URL value with http://localhost:8081
-# VUE_APP_API_URL=https://scriptorium-api.onrender.com
-# For local development, replace VUE_APP_API_URL value with http://localhost:8081
 VUE_APP_API_URL=https://minimal-fullstack.onrender.com
-
 
 
 --- vue.config.js (/Users/chrisyoung/scriptorium/vue.config.js) ---

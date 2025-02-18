@@ -107,17 +107,16 @@ export default {
       }
     },
 
-    // New method to call the /hello endpoint
     async helloBackend() {
-      try {
-        const response = await axios.get(`${process.env.VUE_APP_API_URL}/hello`);
+    try {
+        const response = await axios.get(`${process.env.VUE_APP_API_URL}/api/hello`);
         this.helloMessage = response.data;
         alert(`Response from backend: ${this.helloMessage}`);
-      } catch (error) {
+    } catch (error) {
         console.error("Error calling hello endpoint:", error);
         alert("Failed to call hello endpoint.");
-      }
-    },
+    }
+},
   },
 };
 </script>
